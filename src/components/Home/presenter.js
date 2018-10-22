@@ -1,160 +1,169 @@
 import React , { Component } from 'react';
-import { Alert , 
+import { 
+  Alert , 
+  Dimensions,
+  StyleSheet, 
+  Text, 
+  View, 
+  Image,
+  TouchableOpacity ,
+  StatusBar,
+  ScrollView,
   AsyncStorage,
-  StyleSheet, Text, View, Button, Image, TouchableOpacity, TouchableHighlight,
- } from 'react-native';
+  ImageBackground
+} from 'react-native';
 import {createStackNavigator, StackNavigator} from 'react-navigation';
+
 // import eunwoo from '../image/eunwoo.jpg';
-import {Navigator} from 'react-native-deprecated-custom-components';
+import logoImg from '../../image/logoImg.png';
+import third from '../../image/third.png';
+import second from '../../image/second.png'; 
+import first from '../../image/first.png';
 
-const ACCESS_TOKEN = 'access_token';
+import user from '../../image/user.png';
+import myproject from '../../image/myproject.png';
+import project from '../../image/project.png';
+import friends from '../../image/friends.png';
+import logout from '../../image/logout.png';
+import notice from '../../image/notice.png';
 
-export default class Home extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      isLoggenIn: "",
-      showProgress: false,
-      accessToken: "",
-    }
-  }
-  componentWillMount() {
-    this.getToken();
-  }
-  async getToken() {
-    try {
-      let accessToken = await AsyncStorage.getItem(ACCESS_TOKEN);
-      if(!accessToken) {
-          this.redirect('login');
-      } else {
-          this.setState({accessToken: accessToken})
-      }
-    } catch(error) {
-        console.log("Something went wrong");
-        this.redirect('login');
-    }
-  }
-  async deleteToken() {
-    try {
-        await AsyncStorage.removeItem(ACCESS_TOKEN)
-        this.redirect('root');
-    } catch(error) {
-        console.log("Something went wrong");
-    }
-  }
-  redirect(routeName){
-    this.props.navigator.push({
-      name: routeName,
-      passProps: {
-        accessToken: this.state.accessToken
-      }
-    });
-  }
-  onLogout(){
-    this.setState({showProgress: true})
-    this.deleteToken();
-  }
+const width = Dimensions.get('window').width;
+const height = Dimensions.get('window').height;
 
-  confirmDelete() {
-    AlertIOS.alert("Are you sure?", "This action cannot be undone", [
-      {text: 'Cancel'}, {text: 'Delete', onPress: () => this.onDelete()}
-    ]);
-  }
-
-  async onDelete(){
-    let access_token = this.state.accessToken
-    try {
-      let response = await fetch('https://afternoon-beyond-22141.herokuapp.com/api/users/'+access_token,{
-                              method: 'DELETE',
-                            });
-        let res = await response.text();
-        if (response.status >= 200 && response.status < 300) {
-          console.log("success sir: " + res)
-          this.redirect('root');
-        } else {
-          let error = res;
-          throw error;
-        }
-    } catch(error) {
-        console.log("error: " + error)
-    }
-  }
+export default class Home extends Component {
+  static navigationOptions= ({navigation}) =>({
+    title: 'Home',	
+  }); 
   _onPressButton()  {
-    Alert.alert('You tapped the button!')
+    Alert.alert('Network error!!')
   }
   render() {
-    const {navigation} = this.props;
-    return (
-      <View style={styles.container}>
-      
-        <View style={{height: 150}}>
-          <View style= {{flex:1, height: 150, borderWidth: 0.5, justifyContent: 'center',
-                alignItems: 'center' }}> 
-            <TouchableHighlight
-            onPress={Actions.MyProfile} 
-            >
-          <Image source={eunwoo} style={{height: 50, width: 50}}/>
-          </TouchableHighlight>
-          <Text> USER NAME </Text>
-          </View>
+    const { navigate } = this.props.navigation;
+    return(
+      <ScrollView style={styles.container}>
+      <StatusBar barStyle="dark-content"/>
+      <View style = {{ height: 250}}>
+      <ScrollView  
+          horizontal={true}
+          showsHorizontalScrollIndicator={true}
+          pagingEnabled={true}>
+      <ImageBackground source={first} style={{flex: 1}}>
+      <View style={{
+            height:250,
+            width: width,
+            justifyContent: 'center', 
+            alignItems:'center'}}>
+          <TouchableOpacity>
+             <Text style={{fontSize: 20, color: 'white', padding: 5, textAlign:'left'}}>
+              mouse 님 {"\n"}
+              대학생들의 경계없는 성장공간,{"\n"}
+              Loaf에 오신 것을 환영합니다. 
+             </Text>
+          </TouchableOpacity >
         </View>
-        
-        <View style={{height: 150}}>
-          <View style= {{flex:1, height: 150, borderWidth: 0.5, justifyContent: 'center',
-                    alignItems: 'center' }}>
-            <TouchableHighlight
-            onPress={Actions.MyProject}
-           // onPress={() => navigation.navigate('MyProject'
-            //navigation.navigate(MyProfile)
-          >
-            <View style= {{width: 50, height: 50, backgroundColor: 'gray'}}/>
-          </TouchableHighlight>
-        <Text>MY PROJECT</Text>
-          </View>
+        </ImageBackground>
+
+        <ImageBackground source={second} style={{flex: 1,}}>
+        <View style={{  
+            height:250,
+            width: width,
+            justifyContent: 'center',
+            alignItems:'center',}}>   
+             <Text style={{fontSize: 18, color: 'white'}}>
+               생각만 하던 프로젝트를 올려{"\n"}
+               다양한 사람들과 함께할 수 있습니다.  {"\n"}
+               당신이 하고 싶은 프로젝트를 추천받아 보세요.{"\n"}{"\n"} 
+             </Text>
+              <TouchableOpacity  
+                onPress={() => navigate('Projects')}>
+              <Text style={{fontSize: 18, color:'white', backgroundColor:'#FFA503'}}>
+              프로젝트 찾기 바로가기
+              </Text>
+              </TouchableOpacity >
         </View>
+        </ImageBackground>
+        <ImageBackground source={third} style={{flex: 1,}}> 
+        <View style={{  
+            height:250,
+            width: width,
+            justifyContent: 'center',
+            alignItems:'center',}}>
+           
+             <Text style={{fontSize: 18, color: 'white', paddingLeft: 3}}>
+               관심사가 유사한 친구를 추천받을 수 있습니다.{"\n"}
+               당신과 함께 프로젝트를 진행하고{"\n"}
+               싶은 친구를 찾아보세요.{"\n"}{"\n"} 
+             </Text>
+          <TouchableOpacity  
+                onPress={() => navigate('Friends')}>
+              <Text style={{fontSize: 18, color:'white', backgroundColor:'#FFA503'}}>
+              팀원 찾기 바로가기
+             </Text>
+              </TouchableOpacity >
+             
+        </View>
+        </ImageBackground >
+        </ScrollView>
+        </View>
+        <View style={{height: 150,flexDirection: 'row', paddingTop: 10 } }>
+            <View style= {{flex:1, justifyContent: 'center',
+                      alignItems: 'center'  }}>
+             <TouchableOpacity onPress={() => navigate('MyProfile')}>
+             <Image source={user} style={{height: 90, width:90}}/>
+              </TouchableOpacity >
+                <Text style={{fontSize: 15, paddingTop: 5, color: '#ffa503'}}>나의 프로필</Text>
+              </View>
 
-        <View style={{height: 150,flexDirection: 'row'} }>
+            <View style= {{flex:1, justifyContent: 'center',
+                      alignItems: 'center' }}>
+              <TouchableOpacity  
+               onPress={() => navigate('MyProject')}>
+              <Image source={myproject} style={{height: 95, width:95}}/>
+              </TouchableOpacity>
+                <Text style={{fontSize: 15, paddingTop: 5, color: '#ffa503'}}>나의 프로젝트</Text>
+            </View>
+          </View>
+          <View style={{height: 150,flexDirection: 'row'} }>
 
-          <View style= {{flex:1,borderWidth: 0.5, justifyContent: 'center',
-                    alignItems: 'center' }}>
-            <TouchableHighlight  onPress={this._onPressButton}>
-            <View style= {{width: 50, height: 50, backgroundColor: 'gray'}}/>
-            </TouchableHighlight >
-              <Text>PROJECT</Text>
+            <View style= {{flex:1, justifyContent: 'center',
+                      alignItems: 'center'}}>
+             <TouchableOpacity  onPress={() => navigate('Projects')}>
+             <Image source={project} style={{height: 90, width:90}}/>
+              </TouchableOpacity >
+                <Text style={{fontSize: 15, paddingTop: 5, color: '#ffa503'}}>프로젝트 찾기</Text>
+              </View>
+
+            <View style= {{flex:1, justifyContent: 'center',
+                      alignItems: 'center'}}>
+              <TouchableOpacity  
+               onPress={() => navigate('Friends')}>
+              <Image source={friends} style={{height: 100, width:100}}/>
+              </TouchableOpacity>
+                <Text style={{fontSize: 15, paddingTop: 5, color: '#ffa503'}}>팀원 찾기</Text>
             </View>
 
-          <View style= {{flex:1,borderWidth: 0.5, justifyContent: 'center',
-                    alignItems: 'center' }}>
-            <TouchableHighlight  onPress={this._onPressButton}>
-            <View style= {{width: 50, height: 50, backgroundColor: 'gray'}}/>
-            </TouchableHighlight>
-              <Text>FRIENDS</Text>
           </View>
+          <View style={{height: 80,flexDirection: 'row', paddingBottom:20 } }>
+            <View style= {{flex:1, justifyContent: 'center',
+                      alignItems: 'center'}}>
+              <TouchableOpacity  
+               onPress={() => Alert.alert("can't connect to server")}>
+             <Image source={logout} style={{height:50, width:50}}/>
+              </TouchableOpacity >
+                <Text style={{fontSize: 15, paddingTop: 3, color: '#ffa503'}}>로그아웃</Text>
+              </View>
 
-        </View>
+              <View style= {{flex:1, justifyContent: 'center',
+                      alignItems: 'center' }}>
+               <TouchableOpacity
+                  onPress={() => navigate('ContestInfo')}>
+             <Image source={notice} style={{height:50, width:50}}/>
+              </TouchableOpacity>
+                <Text style={{fontSize: 15,paddingTop:3, color: '#ffa503' }}>공모전 정보</Text>             
+              </View>
 
-
-        <View style={{height: 100,flexDirection: 'row'} }>
-          <View style= {{flex:1,borderWidth: 0.5, justifyContent: 'center',
-                    alignItems: 'center' }}>
-            <TouchableHighlight  onPress={this._onPressButton}>
-            <View style= {{width: 50, height: 50, backgroundColor: 'gray'}}/>
-            </TouchableHighlight >
-              <Text>Logout</Text>
             </View>
-
-            <View style= {{flex:1,borderWidth: 0.5, justifyContent: 'center',
-                    alignItems: 'center' }}>
-              <TouchableHighlight  onPress={this._onPressButton}>        
-            <View style= {{width: 50, height: 50, backgroundColor: 'gray'}}/>
-            </TouchableHighlight>
-              <Text>NOTICE</Text>
-            
-            </View>
-
-          </View>
-
-        </View>
+         </ScrollView>
     );
   }
 }

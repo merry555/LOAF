@@ -4,35 +4,12 @@
 const SET_PROFILE = "SET_PROFILE";
 const REGISTER_PROFILE = "REGISTER_PROFILE";
 const SAVE_TOKEN = "SAVE_TOKEN";
-const API_URL = "http://172.20.10.10:8000/";
-const LOG_IN = "LOG_IN";
-const LOG_OUT = "LOG_OUT";
-const SET_USER = "SET_USER";
-
+const LOGOUT = "LOGOUT";
 const SET_USERNAME = "SET_USERNAME";
 const SET_USERFEED = "SET_USERFEED";
 const SET_PROJECTUSERFEED = "SET_PROJECTUSERFEED";
 
 //action creators
-
-function setLogIn(token) {
-  return {
-    type: LOG_IN,
-    token
-  }
-}
-
-function setUser(user) {
-  return {
-    type: SET_USER,
-    user
-  }
-}
-
-function logout() {
-  return { type: LOG_OUT };
-}
-
 function setUserFeed(feed){
   return {
     type: SET_USERFEED,
@@ -47,6 +24,18 @@ function setProjectUserFeed(feed){
   };
 }
 
+function saveToken(token) {
+  return {
+    type : SAVE_TOKEN,
+    token : token
+  }
+}
+
+function logout() {
+  return {
+    type: LOGOUT
+  }
+}
 
 function setProfile(loggedInUser){
   return {
@@ -70,29 +59,44 @@ function registerProfile(loggedInUser) {
 }
 
 //API actions
-function login(username, password) {
-  return dispatch => {
-    return fetch(`${API_URL}/rest-auth/login/`, {  //API_URL 백앤드 URL
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        username,
-        password
+function getUserFeed(){//전체 프로젝트 가져오기
+  return (dispatch, getState) => {
+      const { users : { token } } = getState();
+      fetch("/users/explore/", {
+          method: "GET",
+          headers: {
+              "Authorization" : `JWT ${token}`
+          }
       })
-    })
-      .then(response => response.json())
-      .then(json => {
-        if (json.user && json.token) {
-          dispatch(setLogIn(json.token));
-          dispatch(setUser(json.user));
-          return true;
-        } else {
-          return false;
-        }
-      });
-  };
+      .then(response => {
+          if(response.status === 401){
+              dispatch(logout());
+          }
+          return response.json();
+      })
+      .then(json => dispatch(setUserFeed(json)))
+  }
+}
+
+
+//프로젝트 별 추천 사용자 
+function getProjectUserFeed(){
+  return (dispatch, getState) => {
+      const { users : { token } } = getState();
+      fetch("/users/", {
+          method: "GET",
+          headers: {
+              "Authorization" : `JWT ${token}`
+          }
+      })
+      .then(response => {
+          if(response.status === 401){
+              dispatch(logout());
+          }
+          return response.json();
+      })
+      .then(json => dispatch(setProjectUserFeed(json)))
+  }
 }
 
 function facebookLogin(access_token) {
@@ -116,81 +120,26 @@ function facebookLogin(access_token) {
   };
 }
 
-function getUserFeed(){//전체 프로젝트 가져오기
-  return (dispatch, getState) => {
-      const { users : { token } } = getState();
-      fetch("/users/explore/", {
-          method: "GET",
-          headers: {
-              "Authorization" : `JWT ${token}`
-          }
-      })
-      .then(response => {
-          if(response.status === 401){
-              dispatch(logout());
-          }
-          return response.json();
-      })
-      .then(json => dispatch(setUserFeed(json)))
-  }
-}
-
-function getOwnProfile() { //개인 프로필
-  return (dispatch, getState) => {
-    const { user: { token, profile: { username } } } = getState();
-    fetch(`${API_URL}/users/${username}/`, {
+function usernameLogin(username, password) {
+  return function(dispatch) {
+    fetch("/rest-auth/login/", {
+      method: "POST",
       headers: {
-        Authorization: `JWT ${token}`
+        "Content-Type" : "application/json"
+      },
+      body : JSON.stringify({
+        username,
+        password,
+      })
+    })
+    .then(response => response.json())
+    .then(json => {
+      if(json.token) {
+        dispatch(saveToken(json.token))
+        dispatch(setUsername(username));
       }
     })
-      .then(response => {
-        if (response.status === 401) {
-          dispatch(logOut());
-        } else {
-          return response.json();
-        }
-      })
-      .then(json => dispatch(setUser(json)));
-  };
-}
-
-function getProfile(username) { // 유저 프로필
-  return (dispatch, getState) => {
-    const { user: { token } } = getState();
-    return fetch(`${API_URL}/users/${username}/`, {
-      headers: {
-        Authorization: `JWT ${token}`
-      }
-    })
-      .then(response => {
-        if (response.status === 401) {
-          dispatch(logOut());
-        } else {
-          return response.json();
-        }
-      })
-      .then(json => json);
-  };
-}
-
-
-//프로젝트 별 추천 사용자 
-function getProjectUserFeed(){
-  return (dispatch, getState) => {
-      const { users : { token } } = getState();
-      fetch("/users/", {
-          method: "GET",
-          headers: {
-              "Authorization" : `JWT ${token}`
-          }
-      })
-      .then(response => {
-          if(response.status === 401){
-              dispatch(logout());
-          }
-          return response.json();
-      })
-      .then(json => dispatch(setProjectUserFeed(json)))
+    .catch(err => console.log(err));
   }
 }
 
@@ -218,6 +167,29 @@ function createAccount(username,email, name, password1, password2) {
     })
     .catch(err => console.log(err));
   }
+}
+
+function getProfile(){
+  return (dispatch, getState) => {
+    const { users: { token, username }} = getState()
+
+    fetch(`/users/${username}/`, {
+      method: "GET",
+      headers: {
+        Authorization : `JWT ${token}`
+      }
+    })
+    .then(response => {
+      if(response.status === 401){
+        dispatch(logout());
+      }
+      return response.json();
+    })
+    .then(json => {
+      dispatch(setProfile(json));
+    })
+    .catch(err => console.log(err));
+  };
 }
 
 
@@ -289,21 +261,20 @@ function createProfile(profile_image, address, school, major, website, bio, tags
 //initial state
 const initialState = {
 
-    isLoggedIn: false
-    
+    isLoggedIn: AsyncStorage.getItem("jwt") ? true : false,
+    token : AsyncStorage.getItem("jwt"),
+    username: AsyncStorage.getItem("username")
 };
 
 //reducer
 function reducer(state = initialState, action) {
     switch (action.type) {
-        case LOG_IN:
-          return applyLogin(state, action);
-        case SET_USER:
-          return applySetUser(state, action);
         case SET_USERFEED:
           return applySetUserFeed(state,action);
-        case LOG_OUT : 
-          return applyLogOut(state, action);
+        case SAVE_TOKEN:
+          return applySetToken(state, action); 
+        case LOGOUT : 
+          return applyLogout(state, action);
         case SET_PROFILE:
           return applySetProfile(state, action); 
         case SET_USERNAME:
@@ -314,23 +285,6 @@ function reducer(state = initialState, action) {
 }
 
 //reducer functions
-function applyLogin(state, action) {
-  const { token } = action;
-  return {
-    ...state,
-    isLoggedIn: true,
-    token
-  };
-}
-
-function applySetUser(state, action) {
-  const { user } = action;
-  return {
-    ...state,
-    profile: user
-  }
-} 
-
 function applySetUserFeed(state, action){
   const { feed } = action;
   return {
@@ -349,13 +303,12 @@ function applySetToken(state, action) {
   }
 }
 
-function applyLogOut(state, action) {
-  AsyncStorage.clear();
+function applyLogout(state, action) {
+  localStorage.removeItem("jwt");
+  localStorage.removeItem("username");
   return {
-    ...state,
-    isLoggedIn: false,
-    token: ""
-  };
+    isLoggedIn : false
+  }
 }
 
 function applySetProfile(state, action) {
@@ -377,12 +330,11 @@ function applySetUsername(state, action) {
 
 //exports
 const actionCreators = {
-    login,
     facebookLogin,
+    usernameLogin,
     createAccount,
     logout,
     getProfile,
-    getOwnProfile,
     setUsername,
     createProfile,
     getUserFeed,

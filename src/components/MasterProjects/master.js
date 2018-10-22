@@ -9,17 +9,17 @@ import {
     TouchableOpacity
 } from "react-native"; 
 
-class RecomProjects extends Component {
+class MasterProjects extends Component {
     constructor() {
         super()
         this.state = {
-            data : []
+            data : [] 
         }
-    }
+    } 
     renderItem = ({ item }) => {
         const { navigation } = this.props;
         return(
-            <TouchableOpacity onPress={() => navigation('ProjectDetail', {
+            <TouchableOpacity onPress={() => navigation('MasterProjectDetail', {
                 itemId : item.id
             })}  
             key={item.id}>
@@ -37,7 +37,7 @@ class RecomProjects extends Component {
         )
     } 
     componentDidMount() {
-        return fetch("https://raw.githubusercontent.com/merry555/json/master/json/projects/recomProjects.json")
+        return fetch("https://raw.githubusercontent.com/merry555/json/master/json/projects/master.json")
         .then((response) => response.json())
         .then((responseJson) => {
             this.setState({
@@ -58,7 +58,7 @@ class RecomProjects extends Component {
         )
     }
 } 
-export default RecomProjects;
+export default MasterProjects;
 
 const styles = StyleSheet.create({
     container: {

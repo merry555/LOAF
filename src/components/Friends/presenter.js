@@ -11,6 +11,9 @@ import {
     Image, 
     Dimensions
 } from "react-native";
+import {createStackNavigator} from 'react-navigation';
+import FriendDetail from '../FriendDetail/presenter'
+
 import Icon from 'react-native-vector-icons/Ionicons'
 import FriendsList from '../FriendsList/presenter'
 import RecomFriends from '../RecomFriends/presenter'
@@ -18,7 +21,9 @@ import RecomFriends from '../RecomFriends/presenter'
 const { height, width } = Dimensions.get('window')
 
 class Friends extends Component {
-
+    static navigationOptions= ({navigation}) =>({
+        title: 'Friends',	
+    }); 
     componentWillMount() {
         this.startHeaderHeight = 80
         if (Platform.OS == 'android') {
@@ -27,11 +32,10 @@ class Friends extends Component {
     }
 
     render() {
+        const { navigate } = this.props.navigation;
         return (
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
-                <View style={{ height: this.startHeaderHeight, backgroundColor: 'white', borderBottomColor: '#dddddd' }}>
-                    </View>
                     <ScrollView
                         scrollEventThrottle={16}
                     >
@@ -46,26 +50,15 @@ class Friends extends Component {
                                     horizontal={true}
                                     showsHorizontalScrollIndicator={false}
                                 >
-                                    <RecomFriends imageUri={require('../../img/home.jpg')}
-                                        name="Home"
-                                    />
-                                    <RecomFriends imageUri={require('../../img/home.jpg')}
-                                        name="Experiences"
-                                    />
-                                    <RecomFriends imageUri={require('../../img/home.jpg')}
-                                        name="Resturant"
-                                    />
+                                    <RecomFriends navigation = {navigate}/>
                                 </ScrollView>
                             </View>
 
                             <View style={{ marginTop: 40, paddingHorizontal: 20 }}>
-                                <Text style={{ fontSize: 24, fontWeight: '700' }}>
+                                <Text style={{ fontSize: 24, fontWeight: '700', marginBottom:10 }}>
                                     친구 목록
                                 </Text>
-                                <Text style={{ fontWeight: '100', marginTop: 10 }}>
-                                    가입한 친구 목록
-                                </Text>
-                                    <FriendsList/>
+                                <FriendsList navigation = {navigate}/>
                             </View>
                         </View>
                     </View>
@@ -75,6 +68,7 @@ class Friends extends Component {
         );
     }
 }
+
 export default Friends;
 
 const styles = StyleSheet.create({

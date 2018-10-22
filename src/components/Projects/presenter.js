@@ -10,85 +10,52 @@ import {
     ScrollView,
     Image,
     Dimensions,
+    TouchableOpacity
 } from "react-native";
 import Icon from 'react-native-vector-icons/Ionicons'
-import IngProject from '../IngProject/presenter'
+import RecruitProject from '../RecruitProject/presenter'
 import RecomProjects from '../RecomProjects/presenter'
 
 const { height, width } = Dimensions.get('window')
 
 class Projects extends Component {
-
+    static navigationOptions= ({navigation}) =>({
+        title: 'Projects',	
+    }); 
     componentWillMount() {
         this.startHeaderHeight = 80
         if (Platform.OS == 'android') {
             this.startHeaderHeight = 100 + StatusBar.currentHeight
         }
-    }
+    } 
 
     render() {
+        const { navigate } = this.props.navigation;
         return (
             <SafeAreaView style={{ flex: 1 }}>
                 <View style={{ flex: 1 }}>
-                <View style={{ height: this.startHeaderHeight, backgroundColor: 'white', borderBottomWidth: 1, borderBottomColor: '#dddddd' }}>
-                        <View style={{
-                            flexDirection: 'row', padding: 10,
-                            backgroundColor: 'white', marginHorizontal: 20,
-                            shadowOffset: { width: 0, height: 0 },
-                            shadowColor: 'black',
-                            shadowOpacity: 0.2,
-                            elevation: 1,
-                            marginTop: Platform.OS == 'android' ? 35 : 20,
-                            marginBottom: Platform.OS == 'android' ? null : 10
-                        }}>
-                            <Icon name="ios-search" size={20} style={{ marginRight: 10 }} />
-                            <TextInput
-                                underlineColorAndroid="transparent"
-                                placeholder="진행중인 프로젝트 찾기"
-                                placeholderTextColor="grey"
-                                style={{ flex: 1, fontWeight: '700', backgroundColor: 'white' }}
-                                secureTextEntry
-                            />
-                        </View>
-                    </View>
+                <View style={{ alignItems:"center", backgroundColor:"white"}}>
+                    <TouchableOpacity style={styles.board} 
+                        onPress={() => navigate('ProjectForm')}>
+                        <Text>프로젝트 등록하기</Text>  
+                    </TouchableOpacity> 
+                </View>
                     <ScrollView
                         scrollEventThrottle={16}
                     >
                     <View>
-                        <View style={{ backgroundColor: 'white', paddingTop: 20 }}>
+                        <View style={{ backgroundColor: 'white'}}>
                             <Text style={{ fontSize: 24, fontWeight: '700', paddingHorizontal: 20 }}>
                                 프로젝트 추천
                             </Text>
-
                             <View style={{ height: 130, marginTop: 20 }}>
-                                <ScrollView
-                                    horizontal={true}
-                                    showsHorizontalScrollIndicator={false}
-                                >
-                                    <RecomProjects imageUri={require('../../img/home.jpg')}
-                                        name="Home"
-                                    />
-                                    <RecomProjects imageUri={require('../../img/home.jpg')}
-                                        name="Experiences"
-                                    />
-                                    <RecomProjects imageUri={require('../../img/home.jpg')}
-                                        name="Resturant"
-                                    />
-                                </ScrollView>
+                                <RecomProjects navigation = {navigate}/>
                             </View>
-
                             <View style={{ marginTop: 40, paddingHorizontal: 20 }}>
-                                <Text style={{ fontSize: 24, fontWeight: '700' }}>
-                                    프로젝트
+                                <Text style={{ fontSize: 24, fontWeight: '700', marginBottom:15 }}>
+                                    프로젝트 목록
                                 </Text>
-                                <Text style={{ fontWeight: '100', marginTop: 10 }}>
-                                    전체 프로젝트 목록
-                                </Text>
-                                        <IngProject imageUri={require('../../img/home.jpg')}
-                                        name="Home"
-                                        />
-                                        <IngProject imageUri={require('../../img/home.jpg')}
-                                        name="Home"/>
+                                <RecruitProject navigation = {navigate}/>
                             </View>
                         </View>
                     </View>
@@ -105,5 +72,17 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center'
-    }
+    },
+    board: {
+        marginTop: 20,
+        height:40,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width:200,
+        borderRadius:30,
+        borderColor: '#000',
+        borderWidth: 0.5,
+        marginBottom:20
+    },
 });

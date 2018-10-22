@@ -1,113 +1,88 @@
 import React, { Component } from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  ActivityIndicator,
-  SafeAreaView
-} from "react-native";
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity,KeyboardAvoidingView,Alert } from 'react-native';
 import { List, ListItem, SearchBar } from "react-native-elements";
-import { getUsers, contains } from "./api/index";
-import _ from "lodash";
+import SearchInput, { createFilter } from 'react-native-search-filter';
+import { Card, CardItem, Thumbnail, Body, Left, Right, Button, Icon } from 'native-base'
+import user from "./api/users";
+import { createStackNavigator } from 'react-navigation';
 
-class App extends Component {
+import FriendDetail from '../FriendDetail/presenter'
+
+const KEYS_TO_FILTERS = ['username', 'tags']
+   
+class FriendsList extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
-      loading: false,
-      data: [],
-      error: null,
-      query: "",
-      fullData: [],
-    };
+      searchTerm:''
+    };   
   }
-
-  componentDidMount() {
-    this.makeRemoteRequest();
+  searchUpdated(term) {
+    this.setState({ searchTerm: term })
   }
-
-  makeRemoteRequest = _.debounce(() => {
-    this.setState({ loading: true });
-
-    getUsers(20, this.state.query)
-      .then(users => {
-        this.setState({
-          loading: false,
-          data: users,
-          fullData: users,
-        });
-      })
-      .catch(error => {
-        this.setState({ error, loading: false });
-      });
-  }, 250);
-  handleSearch = (text) => {
-    const formatQuery = text.toLowerCase();
-    this.setState({query:text});
-    const data =_.filter(this.state.fullData, user=> {
-      return contains(user, formatQuery);
-    });
-    this.setState({ query : formatQuery, data}, ()=> this.makeRemoteRequest)
-  }
-
-  renderSeparator = () => {
-    return (
-      <View
-        style={{
-          height: 1,
-          width: "86%",
-          backgroundColor: "#CED0CE",
-          marginLeft: "14%"
-        }}
-      />
-    );
-  };
-
-  renderHeader = () => {
-    return <SearchBar placeholder="Type Here..." lightTheme round onChangeText={this.handleSearch} />;
-  };
-
-  renderFooter = () => {
-    if (!this.state.loading) return null;
-
-    return (
-      <View
-        style={{
-          paddingVertical: 20,
-          borderTopWidth: 1,
-          borderColor: "#CED0CE"
-        }}
-      >
-        <ActivityIndicator animating size="large" />
-      </View>
-    );
-  };
 
   render() {
+    const filteredFriends = user.filter(createFilter(this.state.searchTerm, KEYS_TO_FILTERS))
+    const { navigation } = this.props;
+    console.log("flist navigation"+ navigation);
+
     return (
-      <SafeAreaView>
-        <List containerStyle={{ borderTopWidth: 0, borderBottomWidth: 0 }}>
-          <FlatList
-            data={this.state.data}
-            renderItem={({ item }) => (
-              <ListItem
-                roundAvatar
-                title={`${item.name.first} ${item.name.last}`}
-                subtitle={item.email}
-                avatar={{ uri: item.picture.thumbnail }}
-                containerStyle={{ borderBottomWidth: 0 }}
-              />
-            )}
-            keyExtractor={item => item.email}
-            ItemSeparatorComponent={this.renderSeparator}
-            ListHeaderComponent={this.renderHeader}
-            ListFooterComponent={this.renderFooter}
-          />
-        </List>
-      </SafeAreaView>
+      <View> 
+      <KeyboardAvoidingView>
+        <SearchInput
+          onChangeText={(term) => {this.searchUpdated(term)}}
+          style={styles.searchInput}
+          placeholder="Search Friends (ex. 취업)"
+        />
+      </KeyboardAvoidingView>
+        <ScrollView>
+          {filteredFriends.map(user => {
+            return( //Alert.alert('You tapped the button!');
+            //navigation('FriendDetail',{itemId:user.id})
+              <TouchableOpacity onPress={() => navigation('FriendDetail', {
+                itemId : user.id
+              })} 
+              key={user.id} 
+              style={styles.emailItem}
+              >
+              <CardItem>
+                  <Left>
+                      <Thumbnail source={{uri : user.profile_image}} />
+                      <Body>
+                          <Text style={{ fontSize: 17 }}>{user.username}</Text>
+                          <Text style={{ fontSize: 15, marginTop:10 }}>#{user.tags[0]} #{user.tags[1]} #{user.tags[2]}</Text>
+                      </Body>
+                  </Left>
+              </CardItem>
+              </TouchableOpacity>
+            )
+          })}
+        </ScrollView>
+      </View>
     );
   }
-}
+} 
 
-export default App;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    justifyContent: 'flex-start'
+  },
+  emailItem:{
+    borderBottomWidth: 0.5,
+    borderColor: 'rgba(0,0,0,0.3)',
+    padding: 10
+  },
+  emailSubject: {
+    color: 'rgba(0,0,0,0.5)'
+  },
+  searchInput:{
+    padding: 10,
+    borderColor: '#CCC',
+    borderWidth: 1,
+    borderRadius : 5
+  }
+});
+
+export default FriendsList;

@@ -1,14 +1,17 @@
 import React, { Component } from "react";
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity,KeyboardAvoidingView, Image } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity,KeyboardAvoidingView, Image, SafeAreaView } from 'react-native';
 import { List, ListItem, SearchBar } from "react-native-elements";
 import SearchInput, { createFilter } from 'react-native-search-filter';
-import projects from './projects';
+import contest from './contest';
 
 const KEYS_TO_FILTERS = ['title', 'tags']
 
-class RecruitProject extends Component {
+class ContestInfo extends Component {
+    static navigationOptions= ({navigation}) =>({
+        title: 'Contest Information',	
+    }); 
   constructor(props) {
-    super(props); 
+    super(props);
     this.state = {
       searchTerm:''
     };
@@ -18,47 +21,46 @@ class RecruitProject extends Component {
     this.setState({ searchTerm: term })
   }   
   render() { 
-    const filteredFriends = projects.filter(createFilter(this.state.searchTerm, KEYS_TO_FILTERS))
+    const filteredFriends = contest.filter(createFilter(this.state.searchTerm, KEYS_TO_FILTERS))
     const { navigation } = this.props;
 
     return (
-      <View>   
+        
+    <SafeAreaView style={{ flex: 1 }}>
+      <View style={{ flex: 1, backgroundColor:'white' }}>   
       <KeyboardAvoidingView>
         <SearchInput
           onChangeText={(term) => {this.searchUpdated(term)}}
           style={styles.searchInput}
-          placeholder="Search Projects (ex. 스키)"
+          placeholder="Search Projects (ex. 공모전)"
         />
       </KeyboardAvoidingView> 
-        <ScrollView>
-          {filteredFriends.map(projects => {
+        <ScrollView
+            scrollEventThrottle={16}
+        >
+          {filteredFriends.map(contest => {
             return(
-              <TouchableOpacity onPress={() => navigation('ProjectDetail', {
-                itemId : projects.id
-              })} 
-              key={projects.id} 
-              style={styles.emailItem}>
                 <View style={{ height: 200, borderWidth: 0.5, borderColor: '#dddddd', marginTop:10 }}>
                   <View style={{ flex: 3 }}>
-                      <Image source={{uri : projects.file}}
+                      <Image source={{uri : contest.file}}
                           style={{ flex: 1, resizeMode: 'cover'}}
                       />
                   </View>
                   <View style={{ flex: 1, paddingLeft: 10, paddingTop: 10 }}>
-                    <Text style={{ fontSize: 17 }}>{projects.title}</Text>
-                    <Text style={{ fontSize: 14, marginTop:2 }}>#{projects.tags[0]} #{projects.tags[1]} #{projects.tags[2]}</Text>
+                    <Text style={{ fontSize: 17 }}>{contest.title}</Text>
+                    <Text style={{ fontSize: 14, marginTop:2 }}>#{contest.tags[0]} #{contest.tags[1]} #{contest.tags[2]}</Text>
                   </View>
                 </View>
-              </TouchableOpacity>
             )
           })}
         </ScrollView>
       </View>
+      </SafeAreaView>
     );
   }
 }
 
-export default RecruitProject;
+export default ContestInfo;
 
 const styles = StyleSheet.create({
     container: {
@@ -78,6 +80,7 @@ const styles = StyleSheet.create({
       padding: 10,
       borderColor: '#CCC',
       borderWidth: 1,
-      borderRadius : 5
+      borderRadius : 5,
+      marginTop: 10
     }
   });
