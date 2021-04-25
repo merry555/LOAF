@@ -9,8 +9,7 @@
 React native라이브러리를 이용하여 프론트앤드 개발.
 
 ## Demo
-<img width="200" alt="loaf1" src="https://user-images.githubusercontent.com/18303573/116001582-1079f080-a630-11eb-82e9-f78d37b42cf7.png">
-<img width="200" alt="loaf2" src="https://user-images.githubusercontent.com/18303573/116001607-2f788280-a630-11eb-9550-0c18f6483a6d.png">
+![loaf](https://user-images.githubusercontent.com/18303573/116001661-76ff0e80-a630-11eb-9f35-b5b14bf27e0e.png)
 
 
 ## 결과 Report
