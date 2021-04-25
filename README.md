@@ -7,4 +7,8 @@
 ## 기여한 부분
 React native라이브러리를 이용하여 프론트앤드 개발.
 
-## 결과
+## Demo
+
+
+## 결과 Report
+https://drive.google.com/file/d/1xd231k_fJWILnui19L6KMdAzSkDjqTct/view?usp=sharing
