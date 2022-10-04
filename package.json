@@ -10,7 +10,7 @@
   },
   "proxy": "exp://172.20.10.2:19000",
   "dependencies": {
-    "expo": "^30.0.1",
+    "expo": "^46.0.14",
     "history": "^4.7.2",
     "lodash": "^4.17.11",
     "native-base": "^2.8.1",
